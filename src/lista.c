@@ -154,3 +154,52 @@ void Lista_insertAfter(Lista* lista, void* dado) {
         lista->size++;
     }
 }
+void Lista_removeCurrent(Lista* lista) {
+    if (lista->cursor != NULL) {
+        ListaNodo* current = lista->cursor;
+        if (current->prev != NULL) {
+            current->prev->next = current->next;
+        } else {
+            lista->head = current->next;
+        }
+        if (current->next != NULL) {
+            current->next->prev = current->prev;
+        } else {
+            lista->tail = current->prev;
+        }
+        if (lista->free_data != NULL) {
+            lista->free_data(current->valor);
+        }
+        free(current->valor);
+        free(current);
+        lista->size--;
+        lista->cursor = NULL;
+    }
+}
+
+int Lista_previous(Lista* lista) {
+    if (lista->cursor != NULL && lista->cursor->prev != NULL) {
+        lista->cursor = lista->cursor->prev;
+        return 1;
+    }
+    return 0;
+}
+
+void Lista_insertBefore(Lista* lista, void* dado) {
+    if (lista->cursor != NULL) {
+        ListaNodo* novo = (ListaNodo*)malloc(sizeof(ListaNodo));
+        novo->valor = malloc(lista->data_size);
+        memcpy(novo->valor, dado, lista->data_size);
+
+        novo->next = lista->cursor;
+        novo->prev = lista->cursor->prev;
+
+        if (lista->cursor->prev != NULL) {
+            lista->cursor->prev->next = novo;
+        } else {
+            lista->head = novo;
+        }
+        lista->cursor->prev = novo;
+        lista->size++;
+    }
+}
